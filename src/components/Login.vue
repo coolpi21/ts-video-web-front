@@ -36,6 +36,10 @@ import { checkTelNumber } from "../util/reg";
 import type { FormInstance } from "element-plus";
 import { ElMessage } from "element-plus";
 import { Login } from "@/request/index";
+import { userStore } from "@/store/user";
+
+const store = userStore();
+
 const ruleFormRef = ref<FormInstance>();
 const router = useRouter();
 const validatePass = (rule: any, value: any, callback: any) => {
@@ -75,10 +79,11 @@ const submitForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.validate(async (valid) => {
     if (valid) {
-      await Login.login({
+      const { token } = await Login.login({
         phone: ruleForm.phone,
         password: ruleForm.password,
       });
+      store.rejectToken(token);
       ElMessage({
         message: "登入成功",
         type: "success",
