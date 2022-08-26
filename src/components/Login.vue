@@ -79,9 +79,13 @@ const submitForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.validate(async (valid) => {
     if (valid) {
-      const { token } = await Login.login({
+      const { token, avatar, username } = await Login.login({
         phone: ruleForm.phone,
         password: ruleForm.password,
+      });
+      store.updateUserInfo({
+        avatar,
+        username,
       });
       store.rejectToken(token);
       ElMessage({

@@ -8,5 +8,5 @@
 // }
 
 import * as Login from "./login/index";
-
-export { Login };
+import * as Upload from "./upload/index";
+export { Login, Upload };

@@ -1,12 +1,22 @@
+import { reject } from "lodash";
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 
-export const userStore = defineStore("user", () => {
-  let token = ref<string>("");
+interface UserInfo {
+  avatar: string;
+  username: string;
+}
 
-  function rejectToken(rejectToken: string) {
-    token.value = rejectToken;
-  }
-
-  return { token, rejectToken };
+export const userStore = defineStore("user", {
+  state: () => {
+    return { userInfo: {}, token: "" };
+  },
+  actions: {
+    rejectToken(rejectToken: string) {
+      this.token = rejectToken;
+    },
+    updateUserInfo(info: UserInfo) {
+      this.userInfo = info;
+    },
+  },
 });
