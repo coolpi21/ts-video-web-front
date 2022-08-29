@@ -1,5 +1,20 @@
 <template>
-  <div>
+  <el-input
+    class="content__input"
+    v-model="contentText"
+    maxlength="20"
+    placeholder="输入内容"
+    show-word-limit
+    type="text"
+  />
+  <el-upload
+    class="upload-demo"
+    @change="fileChange($event as File)"
+    :http-request="authUpload"
+  >
+    <el-button size="small" type="primary">点击上传</el-button>
+  </el-upload>
+  <!-- <div>
     <input
       type="file"
       id="fileUpload"
@@ -16,8 +31,8 @@
       <span class="progress"
         >上传进度: <i id="auth-progress">{{ authProgress }}</i> %</span
       >
-    </div>
-  </div>
+    </div> -->
+  <!-- </div> -->
 </template>
 
 <script lang="ts" setup>
@@ -25,6 +40,7 @@ import { ref } from "vue";
 import { ElMessage } from "element-plus";
 import { Upload } from "@/request/index";
 
+let contentText = ref("");
 let uploader: any,
   authProgress = ref(0),
   statusText: String,
@@ -32,9 +48,11 @@ let uploader: any,
   pauseDisabled: Boolean,
   uploadDisabled: Boolean;
 
-const fileChange = (e: Event) => {
-  const target = e.target as HTMLInputElement;
-  const file: File = (target.files as FileList)[0];
+interface UploadFile extends File {
+  raw: File;
+}
+const fileChange = (e: File) => {
+  const file: UploadFile = e as UploadFile;
   if (!file) {
     ElMessage({
       message: "请先选择需要上传的文件",
@@ -53,7 +71,9 @@ const fileChange = (e: Event) => {
 
   uploader = createUploader();
   console.log("bbb", uploader);
-  uploader.addFile(file, null, null, null, userData);
+  console.log(file);
+
+  uploader.addFile(file.raw, null, null, null, userData);
   uploadDisabled = false;
   pauseDisabled = true;
   resumeDisabled = true;
@@ -205,7 +225,7 @@ const createUploader = () => {
           "%"
       );
       let progressPercent = Math.ceil(progress * 100);
-      authProgress.value= progressPercent;
+      authProgress.value = progressPercent;
       statusText = "文件上传中...";
     },
     // 上传凭证超时
@@ -236,4 +256,8 @@ const createUploader = () => {
   return uploader;
 };
 </script>
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.content__input {
+  margin-bottom: 20px;
+}
+</style>
