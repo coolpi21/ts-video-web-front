@@ -9,7 +9,15 @@
         />
       </div>
       <div class="header-container__avatar">
-        <el-avatar shape="square" :src="squareUrl" />
+        <el-dropdown @command="handleCommand">
+          <el-avatar shape="square" :src="squareUrl" />
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="a">个人中心</el-dropdown-item>
+              <el-dropdown-item command="b">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </div>
     </div>
   </header>
@@ -23,13 +31,34 @@ import UploadVideo from "../components/UploadVideo.vue";
 import { ref } from "vue";
 import { userStore } from "@/store/user";
 import { Search } from "@element-plus/icons-vue";
+import { useRouter } from "vue-router";
 
 const store = userStore();
+const router = useRouter();
+const { avatar, userId } = store.userInfo;
+const squareUrl = avatar;
 
-const squareUrl = ref(store.userInfo.avatar);
 const searchValue = ref("");
 
-console.log(store.token);
+const handleCommand = (command: string | number | object) => {
+  switch (command) {
+    case "a":
+      router.push({
+        name: "personal",
+        params: {
+          user_id: userId,
+        },
+      });
+      break;
+    case "b":
+      localStorage.removeItem("userInfo");
+      localStorage.removeItem("token");
+      router.push({
+        name: "login",
+      });
+      break;
+  }
+};
 </script>
 <style scoped lang="scss">
 .container {

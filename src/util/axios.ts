@@ -6,6 +6,7 @@ import axios, {
   AxiosResponse,
 } from "axios";
 import { ElMessage } from "element-plus";
+const token = localStorage.getItem("token") || "";
 // 数据返回的接口
 // 定义请求响应参数，不含data
 interface Result {
@@ -48,6 +49,9 @@ class RequestHttp {
         // const token = localStorage.getItem('token') || '';
         return {
           ...config,
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
           // headers: {
           //   'x-access-token': token, // 请求头中携带token信息
           // }

@@ -9,4 +9,5 @@
 
 import * as Login from "./login/index";
 import * as Upload from "./upload/index";
-export { Login, Upload };
+import * as Video from "./video/index";
+export { Login, Upload, Video };
