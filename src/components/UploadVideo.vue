@@ -6,6 +6,7 @@
     placeholder="输入内容"
     show-word-limit
     type="text"
+    @blur="onSubmitContent"
   />
   <el-upload
     class="upload-demo"
@@ -14,29 +15,10 @@
   >
     <el-button size="small" type="primary">点击上传</el-button>
   </el-upload>
-  <!-- <div>
-    <input
-      type="file"
-      id="fileUpload"
-      @change="fileChange($event as InputEvent)"
-    />
-    <label class="status"
-      >上传状态: <span>{{ statusText }}</span></label
-    >
-    <div class="upload-type">
-      上传方式一, 使用 UploadAuth 上传:
-      <button @click="authUpload" :disabled="uploadDisabled">开始上传</button>
-      <button @click="pauseUpload" :disabled="pauseDisabled">暂停</button>
-      <button :disabled="resumeDisabled" @click="resumeUpload">恢复上传</button>
-      <span class="progress"
-        >上传进度: <i id="auth-progress">{{ authProgress }}</i> %</span
-      >
-    </div> -->
-  <!-- </div> -->
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, defineEmits } from "vue";
 import { ElMessage } from "element-plus";
 import { Upload } from "@/request/index";
 
@@ -47,6 +29,8 @@ let uploader: any,
   resumeDisabled: Boolean,
   pauseDisabled: Boolean,
   uploadDisabled: Boolean;
+let uploadVideoId = ref("");
+const emit = defineEmits(["after-upload-success", "after-submit-content"]);
 
 interface UploadFile extends File {
   raw: File;
@@ -70,8 +54,6 @@ const fileChange = (e: File) => {
   }
 
   uploader = createUploader();
-  console.log("bbb", uploader);
-  console.log(file);
 
   uploader.addFile(file.raw, null, null, null, userData);
   uploadDisabled = false;
@@ -80,11 +62,7 @@ const fileChange = (e: File) => {
 };
 
 const authUpload = () => {
-  console.log(uploader);
-
   if (uploader) {
-    console.log("start");
-
     uploader.startUpload();
   }
 };
@@ -123,6 +101,7 @@ const createUploader = () => {
           let uploadAuth = UploadAuth;
           let uploadAddress = UploadAddress;
           let videoId = VideoId;
+          uploadVideoId.value = videoId;
           uploader.setUploadAuthAndAddress(
             uploadInfo,
             uploadAuth,
@@ -180,6 +159,8 @@ const createUploader = () => {
           uploadInfo.object
       );
       statusText = "文件上传成功!";
+      ElMessage({ message: "上传成功", type: "success" });
+      emit("after-upload-success", uploadVideoId.value);
     },
     // 文件上传失败
     onUploadFailed: function (uploadInfo: any, code: string, message: string) {
@@ -254,6 +235,13 @@ const createUploader = () => {
   console.log("---aaa---", uploader);
 
   return uploader;
+};
+
+/**
+ * 提交发布内容
+ */
+const onSubmitContent = () => {
+  emit("after-submit-content", contentText.value);
 };
 </script>
 <style scoped lang="scss">

@@ -10,4 +10,5 @@
 import * as Login from "./login/index";
 import * as Upload from "./upload/index";
 import * as Video from "./video/index";
-export { Login, Upload, Video };
+import * as User from "./User/index";
+export { Login, Upload, Video, User };

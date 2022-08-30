@@ -4,41 +4,118 @@
       <el-avatar :size="150" :src="avatar" />
     </div>
     <div class="info">
-      <div class="top">
-        {{ username }}
+      <div class="top flex-row">
+        <div class="user-info">
+          {{ username }}
+        </div>
+        <el-tooltip
+          class="box-item"
+          effect="light"
+          :content="followToolTip"
+          placement="bottom"
+        >
+          <el-button
+            :icon="followIconValue"
+            :type="followType"
+            circle
+            v-if="isNotPersonal"
+            @click="onFollowHandler"
+          ></el-button>
+        </el-tooltip>
       </div>
       <div class="middle flex-row">
         <div class="middle-info__list">{{ count }}个视频</div>
-        <div class="middle-info__list">关注者：123123</div>
-        <div class="middle-info__list">关注： 22</div>
+        <div class="middle-info__list">关注者：{{ followersCount }}</div>
+        <div class="middle-info__list">关注： {{ followCount }}</div>
       </div>
-      <div class="bottom">123132131323</div>
+      <div class="bottom">{{ desc }}</div>
     </div>
   </div>
   <div class="container content flex-row">
     <div class="item" v-for="(item, index) in list" :key="'note' + list">
       <img :src="item.vodCoverImage" alt="" class="coverImage" />
-      <div class="info">缓解痛经的迷惑行为 求生欲满满</div>
+      <div class="info">{{ item.content }}</div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onBeforeMount, ref } from "vue";
-import { Video } from "@/request/index";
+import { onBeforeMount, ref, watch } from "vue";
+import { Video, User } from "@/request/index";
 import { userStore } from "@/store/user";
-
+import { Star, Check } from "@element-plus/icons-vue";
+import { useRoute } from "vue-router";
+import { ElMessage } from "element-plus";
 const store = userStore();
-const { userId, avatar, username } = store.userInfo;
+const route = useRoute();
+const {
+  userInfo: { userId },
+} = store;
+// 当前访问的UserId
+const currentPageUserId = route.params.user_id;
 let count = ref(0);
+let username = ref("");
 let coverImage = ref("");
+let avatar = ref("");
 let list = ref([]);
+let followIconValue = ref(Star);
+let followType = ref("primary");
+let isFollow = ref(false);
+let followCount = ref(0);
+let followersCount = ref(0);
+let desc = ref("");
+let followToolTip = ref("关注");
+
 onBeforeMount(async () => {
-  const listInfo = await Video.getVideoList(userId);
+  const listInfo = await Video.getVideoList(currentPageUserId);
+  const userInfo = await User.getUserInfo(currentPageUserId);
+  username.value = userInfo.phone;
+  followCount.value = userInfo.followCount;
+  followersCount.value = userInfo.followersCount;
+  desc.value = userInfo.channelDesc;
+  avatar.value = userInfo.avatar;
   count.value = listInfo.count;
   list.value = listInfo.list;
+  isFollow.value = userInfo.isFollow;
   // coverImage.value = list.list[0].vodCoverImage;
 });
+
+/**
+ * 判断isFollow是否关注， 更新FollowType的值
+ */
+watch(isFollow, (isFollow) => {
+  followIconValue.value = isFollow ? Check : Star;
+  followType.value = isFollow ? "success" : "primary";
+  followToolTip.value = isFollow ? "取消关注" : "关注";
+});
+
+/**
+ * 判断是否是自己的主页展示关注icon
+ */
+const isNotPersonal = ref(false);
+
+if (userId !== currentPageUserId) {
+  isNotPersonal.value = true;
+}
+
+/**
+ * 关注用户
+ */
+const onFollowHandler = async () => {
+  if (isFollow.value) {
+    // 已关注 -> 取消关注
+    await User.unFollowUser(currentPageUserId);
+    ElMessage({ message: "取消关注成功", type: "success" });
+    followersCount.value -= 1;
+    isFollow.value = false;
+  } else {
+    // 未关注 -> 新增关注
+    await User.followUser(currentPageUserId);
+    ElMessage({ message: "关注成功", type: "success" });
+    followersCount.value += 1;
+    isFollow.value = true;
+  }
+};
 </script>
 <style scoped lang="scss">
 .container {
@@ -62,6 +139,9 @@ onBeforeMount(async () => {
 .top {
   margin-bottom: 40px;
   font-size: 26px;
+  .user-info {
+    margin-right: 20px;
+  }
 }
 .middle {
   margin-bottom: 30px;
@@ -114,5 +194,8 @@ onBeforeMount(async () => {
     font-weight: 400;
     line-height: 24px;
   }
+}
+.middle-info__list {
+  min-width: 120px;
 }
 </style>

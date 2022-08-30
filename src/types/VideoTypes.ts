@@ -10,6 +10,6 @@
 export interface GetVideoListResType {
   code: number;
   list: any;
-  count: number;
+  count?: number;
   msg: string;
 }
