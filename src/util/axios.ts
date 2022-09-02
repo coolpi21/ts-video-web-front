@@ -6,7 +6,8 @@ import axios, {
   AxiosResponse,
 } from "axios";
 import { ElMessage } from "element-plus";
-const token = localStorage.getItem("token") || "";
+import { userStore } from "@/store/user";
+
 // 数据返回的接口
 // 定义请求响应参数，不含data
 interface Result {
@@ -46,6 +47,8 @@ class RequestHttp {
      */
     this.service.interceptors.request.use(
       (config: AxiosRequestConfig) => {
+        const store = userStore();
+        const token = store.token;
         // const token = localStorage.getItem('token') || '';
         return {
           ...config,

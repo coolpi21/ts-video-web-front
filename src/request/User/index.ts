@@ -26,3 +26,10 @@ export const unFollowUser = (user_id: string) => {
 export const getUserList = () => {
   return axios.get<GetUserInfoRes>(`api/v1/user/user-list`);
 };
+
+// 创建头像
+export const createAvatar = (imageId: string) => {
+  return axios.post<GetUserInfoRes>(`api/v1/video/create-avatar`, {
+    imageId,
+  });
+};
