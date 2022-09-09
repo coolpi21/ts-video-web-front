@@ -26,6 +26,9 @@
             placeholder="请输入个人签名"
           ></el-input>
         </div>
+        <div class="item text-align-right">
+          <el-button type="primary" @click="onUpdateUserInfo">更新</el-button>
+        </div>
       </div>
     </div>
     <div class="content__wrapper">
@@ -58,8 +61,10 @@
 <script lang="ts" setup>
 import { onBeforeMount, ref } from "vue";
 import { userStore } from "../store/user";
-import { Video } from "../request";
+import { Video, User } from "../request";
 import useUpload from "../hooks/useUpload";
+import { ElMessage } from "element-plus";
+// import { User as UserIcon } from "@element-plus/icons-vue";
 
 const emit = defineEmits(["after-upload-success"]);
 const imageUrl = ref("");
@@ -93,6 +98,21 @@ const getCollectionVideoList = async () => {
  */
 const onUnCollect = async (item: any) => {
   await Video.unCollectVideo(item._id);
+};
+
+/**
+ * 更新用户信息
+ */
+const onUpdateUserInfo = async () => {
+  try {
+    await User.updateUserInfo({
+      username: username.value,
+      channelDesc: signature.value,
+    });
+    ElMessage({ message: "更新成功", type: "success" });
+  } catch (e) {
+    console.log("更新用户信息失败", e);
+  }
 };
 </script>
 <style scoped lang="scss">
@@ -135,6 +155,9 @@ const onUnCollect = async (item: any) => {
   margin-bottom: 10px;
   .item {
     margin-top: 10px;
+    &.text-align-right {
+      text-align: right;
+    }
     .label {
       margin-bottom: 5px;
     }

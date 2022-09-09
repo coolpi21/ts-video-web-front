@@ -62,3 +62,10 @@ export const getCollectionVideoList = () => {
     `/api/v1/video/get-collection-video-list`
   );
 };
+
+// 获取视频播放地址
+export const getVideoPlayUrl = (videoId: string) => {
+  return axios.get<GetVideoListResType>(
+    `/api/v1/video/get-video-play-url/${videoId}`
+  );
+};

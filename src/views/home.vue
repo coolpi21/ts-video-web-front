@@ -1,16 +1,17 @@
 <template>
- 
   <div class="content">
     <div class="container mt-20">
       <homeContentVue
         :list="videoList"
+        :recommendUserList="recommendUserList"
         @show-comment-list="onShowCommentList"
         @like-video="onHandleLikeVideo"
         @collect-video="onHandleCollectVideo"
+        @play-video="onHandlePlayVideo"
       ></homeContentVue>
     </div>
   </div>
- 
+
   <!-- 评论列表 -->
   <el-dialog v-model="commentListShow" title="评论列表" width="30%">
     <div class="comment-list__wrapper" v-if="commentList.length > 0">
@@ -28,6 +29,14 @@
     </div>
     <div class="comment-list__wrapper" v-else>暂无评论</div>
   </el-dialog>
+
+  <!-- 视频播放器 -->
+  <Teleport to="body">
+    <div v-if="isShowVideo" class="video-panel">
+      <div class="mask" @click="onCloseVideoPanel"></div>
+      <video :src="playSrc" controls></video>
+    </div>
+  </Teleport>
 </template>
 
 <script lang="ts" setup>
@@ -36,7 +45,6 @@ import { onBeforeMount, ref, watch } from "vue";
 import { userStore } from "@/store/user";
 import { useRouter } from "vue-router";
 import { Video, User, CommentReq } from "@/request/index";
-
 
 const store = userStore();
 
@@ -50,11 +58,31 @@ const userList = ref([]);
 const hasSearchUserResult = ref(false);
 const searchUserResultList = ref([]);
 const videoList = ref([]);
+const playSrc = ref("");
+const isShowVideo = ref(false);
+const recommendUserList = ref([]);
+const onHandlePlayVideo = async (item: any) => {
+  console.log(item);
+  const result = await Video.getVideoPlayUrl(item.vodVideoId);
+  console.log(result);
+
+  isShowVideo.value = true;
+  playSrc.value = result.playUrl;
+};
 
 onBeforeMount(() => {
   getVideoList();
+  getRecommendUserList();
 });
 
+/**
+ * 获取推荐用户列表
+ */
+
+const getRecommendUserList = async () => {
+  const userListInfo = await User.getRecommendUserList();
+  recommendUserList.value = userListInfo.userList;
+};
 /**
  * 获取收藏的视频列表
  */
@@ -121,6 +149,14 @@ const onHandleCollectVideo = async (isCollect: boolean, item: any) => {
     ? await Video.collectVideo(item._id)
     : await Video.unCollectVideo(item._id);
   findItem.isCollect = !findItem.isCollect;
+};
+
+/**
+ * 关闭视频面板
+ */
+
+const onCloseVideoPanel = () => {
+  isShowVideo.value = false;
 };
 </script>
 <style scoped lang="scss">
@@ -199,6 +235,31 @@ const onHandleCollectVideo = async (isCollect: boolean, item: any) => {
     .comment-content {
       font-size: 14px;
     }
+  }
+}
+.video-panel {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  .mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.3);
+  }
+  video {
+    position: absolute;
+    z-index: 1000;
+    top: 50%;
+    left: 50%;
+    width: 640px;
+    height: 360px;
+    transform: translate(-50%, -50%);
   }
 }
 </style>

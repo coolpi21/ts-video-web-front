@@ -1,31 +1,33 @@
 <template>
-  <div class="login-logo__content"></div>
-  <div class="login-content__wrapper">
-    <div class="logo">短视频社交平台</div>
-    <el-form
-      ref="ruleFormRef"
-      :rules="rules"
-      label-width="60px"
-      :model="ruleForm"
-      style="max-width: 460px"
-    >
-      <el-form-item label="手机号" prop="phone">
-        <el-input v-model="ruleForm.phone" />
-      </el-form-item>
-      <el-form-item label="密码" prop="password">
-        <el-input
-          type="password"
-          v-model="ruleForm.password"
-          :show-password="true"
-        />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="submitForm(ruleFormRef)"
-          >登录</el-button
-        >
-        <el-button @click="resetForm(ruleFormRef)">重置 </el-button>
-      </el-form-item>
-    </el-form>
+  <div class="container">
+    <div class="login-logo__content"></div>
+    <div class="login-content__wrapper">
+      <div class="logo">短视频社交平台</div>
+      <el-form
+        ref="ruleFormRef"
+        :rules="rules"
+        label-width="60px"
+        :model="ruleForm"
+        style="max-width: 460px"
+      >
+        <el-form-item label="手机号" prop="phone">
+          <el-input v-model="ruleForm.phone" />
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input
+            type="password"
+            v-model="ruleForm.password"
+            :show-password="true"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm(ruleFormRef)"
+            >登录</el-button
+          >
+          <el-button @click="resetForm(ruleFormRef)">重置 </el-button>
+        </el-form-item>
+      </el-form>
+    </div>
   </div>
 </template>
 
@@ -113,13 +115,20 @@ const resetForm = (formEl: FormInstance | undefined) => {
 </script>
 
 <style scoped lang="scss">
+.container {
+  position: absolute;
+  width: 640px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 .logo {
   text-align: center;
   margin-bottom: 12px;
 }
 .login-logo__content {
   position: absolute;
-  left: 400px;
+  left: 0;
   top: 50%;
   transform: translateY(-50%);
   width: 200px;
@@ -132,7 +141,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
   align-items: center;
   justify-content: center;
   position: absolute;
-  right: 200px;
+  right: 0;
   top: 50%;
   transform: translateY(-50%);
   color: #262626;

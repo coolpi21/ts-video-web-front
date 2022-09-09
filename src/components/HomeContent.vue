@@ -10,7 +10,7 @@
           <el-avatar :size="40" :src="item.user.avatar"></el-avatar>
           <span class="username">{{ item.user.phone }}</span>
         </div>
-        <div class="middle-content">
+        <div class="middle-content" @click="onHandlePlayVideo(item)">
           <img :src="item.vodCoverImage" alt="" class="coverImage" />
         </div>
         <div
@@ -45,7 +45,25 @@
         </div>
       </div>
     </div>
-    <div class="right-side">右边</div>
+    <div class="right-side">
+      <div class="top flex-row">
+        <h1 class="top-title">为你推荐</h1>
+      </div>
+      <div class="content">
+        <div
+          class="user-list flex-row align-items-center justify-content-between"
+          v-for="(item, index) in recommendUserList"
+        >
+          <div class="user-list-left-side flex-row align-items-center">
+            <el-avatar :src="item.avatar"></el-avatar>
+            <div class="user-name">{{ item.username }}</div>
+          </div>
+          <div class="user-list-right-side" @click="onFollowHandler(index)">
+            {{ item.isFollow === 1 ? "已关注" : "关注" }}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -54,14 +72,28 @@ import { ref } from "vue";
 import { Apple, Star, Comment } from "@element-plus/icons-vue";
 import { CommentReq } from "@/request/index";
 import { ElMessage } from "element-plus";
+interface UserList {
+  avatar: string;
+  username: string;
+  isFollow: number;
+}
 // 获取列表数据
-defineProps({
+const props = defineProps({
   list: {
     type: Array,
     default: () => [],
   },
+  recommendUserList: {
+    type: Array,
+    default: () => [],
+  },
 });
-const emit = defineEmits(["show-comment-list", "like-video", "collect-video"]);
+const emit = defineEmits([
+  "show-comment-list",
+  "like-video",
+  "collect-video",
+  "play-video",
+]);
 
 /**
  * 评论
@@ -103,6 +135,20 @@ const onHandleCollectVideo = (item: any) => {
   emit("collect-video", item.isCollect ? false : true, item);
 };
 
+/**
+ * 展示视频
+ */
+const onHandlePlayVideo = (item: any) => {
+  emit("play-video", item);
+};
+
+/**
+ * 关注成员文案
+ */
+const followText = ref("关注");
+const onFollowHandler = (index) => {
+  props.recommendUserList[index].isFollow = 1;
+};
 </script>
 <style scoped lang="scss">
 .flex-row {
@@ -193,6 +239,28 @@ const onHandleCollectVideo = (item: any) => {
     font-size: 12px;
     color: #cccccc;
     cursor: pointer;
+  }
+}
+
+.right-side {
+  .top-title {
+    margin: 0;
+    font-size: 16px;
+    color: rgb(142, 142, 142);
+  }
+  .user-list {
+    margin: 10px 0;
+    .user-name {
+      color: rgb(38, 38, 38);
+      margin-left: 10px;
+      font-size: 14px;
+    }
+    .user-list-right-side {
+      color: rgb(0, 149, 246);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
   }
 }
 </style>

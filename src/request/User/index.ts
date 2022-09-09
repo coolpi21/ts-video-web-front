@@ -9,6 +9,13 @@ export const getUserInfo = (user_id: string) => {
     .then((res: any) => res.userInfo);
 };
 
+// 更新用户信息
+export const updateUserInfo = (params: any) => {
+  return axios
+    .put<GetUserInfoRes>(`/api/v1/user/user-info`, params)
+    .then((res: any) => res.userInfo);
+};
+
 // 关注用户
 export const followUser = (user_id: string) => {
   return axios.post<GetUserInfoRes>(`api/v1/user/follow-user`, {
@@ -32,4 +39,9 @@ export const createAvatar = (imageId: string) => {
   return axios.post<GetUserInfoRes>(`api/v1/video/create-avatar`, {
     imageId,
   });
+};
+
+// 获取推荐用户列表
+export const getRecommendUserList = () => {
+  return axios.get<GetUserInfoRes>(`api/v1/user/recommend/user-list`);
 };

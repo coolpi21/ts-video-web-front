@@ -164,16 +164,6 @@ export default (emit: any, type: string, imageUrl: Ref<string>) => {
             uploadInfo.object
         );
         statusText.value = "文件上传成功!";
-        if (type === "video") {
-          ElMessage({ message: "上传成功", type: "success" });
-          emit("after-upload-success", uploadVideoId.value);
-        }
-        if (type === "avatar") {
-          const { avatarUrl } = await User.createAvatar(uploadImageId.value);
-          imageUrl.value = avatarUrl;
-          store.updateUserAvatar(avatarUrl);
-          ElMessage({ message: "上传头像成功", type: "success" });
-        }
       },
       // 文件上传失败
       onUploadFailed: function (
@@ -244,12 +234,21 @@ export default (emit: any, type: string, imageUrl: Ref<string>) => {
         statusText.value = "文件超时...";
       },
       // 全部文件上传结束
-      onUploadEnd: function (uploadInfo: any) {
+      onUploadEnd: async function (uploadInfo: any) {
         console.log("onUploadEnd: uploaded all the files");
         statusText.value = "文件上传完毕";
+        if (type === "video") {
+          ElMessage({ message: "上传成功", type: "success" });
+          emit("after-upload-success", uploadVideoId.value);
+        }
+        if (type === "avatar") {
+          const { avatarUrl } = await User.createAvatar(uploadImageId.value);
+          imageUrl.value = avatarUrl;
+          store.updateUserAvatar(avatarUrl);
+          ElMessage({ message: "上传头像成功", type: "success" });
+        }
       },
     });
-    console.log("---aaa---", uploader);
 
     return uploader;
   };
